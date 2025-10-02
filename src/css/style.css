@@ -1,0 +1,345 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+/* --- トップページ --- */
+.settings-form h2 {
+    color: #34495e;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.form-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555;
+}
+.checkbox-group, .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.checkbox-group label, .radio-group label {
+    font-weight: normal;
+}
+.start-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+.start-btn:hover {
+    background-color: #2980b9;
+}
+
+
+/* --- クイズページ --- */
+.quiz-status {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+    background-color: #ecf0f1;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.question-text {
+    font-size: 22px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    text-align: left;
+    min-height: 80px;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.option-btn {
+    width: 100%;
+    padding: 18px;
+    font-size: 16px;
+    background-color: #fff;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.option-btn:not(:disabled):hover {
+    background-color: #ecf0f1;
+    border-color: #3498db;
+}
+
+.option-btn.correct {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+    font-weight: bold;
+}
+
+.option-btn.incorrect {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+    font-weight: bold;
+}
+
+.result-container {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    text-align: left;
+}
+
+#result-message {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 0;
+}
+#result-message.correct { color: #28a745; }
+#result-message.incorrect { color: #dc3545; }
+
+#explanation {
+    margin-top: 15px;
+    line-height: 1.7;
+}
+
+.next-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 20px;
+}
+.next-btn:hover {
+    background-color: #218838;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 30px;
+    color: #3498db;
+    text-decoration: none;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* css/style.css の末尾に追記 */
+
+.select-box {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.completion-container {
+    padding: 30px;
+    text-align: center;
+}
+.completion-container h2 {
+    color: #28a745;
+}
+.completion-container p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.completion-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reset-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.reset-btn:hover {
+    background-color: #c82333;
+}
+/* css/style.css の末尾に追記 */
+
+#review-area {
+    margin-top: 40px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+    text-align: left;
+}
+
+#review-area h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #34495e;
+}
+
+.review-item {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.review-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.review-question {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.review-answer {
+    margin: 5px 0;
+}
+
+.review-correct {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.review-incorrect {
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-decoration: line-through;
+}
+
+.review-icon {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+/* css/style.css の末尾に追記 */
+
+.progress-text {
+    font-size: 0.9em;
+    color: #555;
+    margin-left: 10px;
+}
+
+.reset-section {
+    margin-top: 40px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+}
+
+.reset-section .reset-btn {
+    width: 100%;
+    background-color: #7f8c8d;
+}
+.reset-section .reset-btn:hover {
+    background-color: #6c7a7b;
+}
+
+/* 既存の .reset-btn スタイルの調整 */
+.completion-actions .reset-btn {
+    width: 100%; /* 明示的に指定 */
+}
+/* css/style.css の末尾に追記 */
+
+.secondary-btn {
+    background-color: #f0ad4e;
+}
+.secondary-btn:hover {
+    background-color: #ec971f;
+}
+/* css/style.css の末尾に追記 */
+
+#session-attempt-count {
+    font-weight: normal;
+    color: #3498db;
+}
+
+#written-answer-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#written-answer-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.written-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.written-actions .next-btn {
+    width: 100%;
+    margin-top: 0;
+}
+
+.written-actions .secondary-btn {
+    width: 100%;
+    padding: 15px 10px;
+    font-size: 16px;
+}

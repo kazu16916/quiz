@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: ./php
+    container_name: quiz-app-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    restart: always
