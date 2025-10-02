@@ -39,24 +39,84 @@ document.addEventListener('DOMContentLoaded', () => {
         attemptNumber: 1,
     };
 
-    function calculateSimilarity(str1, str2) {
-        const normalize = (s) => s.normalize('NFKC').toLowerCase().replace(/\s+/g, '').replace(/[、。.,]/g, '');
-        const s1 = normalize(str1);
-        const s2 = normalize(str2);
-        const len1 = s1.length;
-        const len2 = s2.length;
-        if (len1 === 0 || len2 === 0) return 0;
-        const matrix = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(null));
-        for (let i = 0; i <= len1; i++) matrix[i][0] = i;
-        for (let j = 0; j <= len2; j++) matrix[0][j] = j;
-        for (let i = 1; i <= len1; i++) {
-            for (let j = 1; j <= len2; j++) {
-                const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
-                matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
-            }
+    // キーワード抽出関数（助詞、接続詞などを除外）
+    function extractKeywords(text) {
+        // 括弧を削除せずに正規化
+        const normalized = text.normalize('NFKC').toLowerCase();
+        // 助詞や接続詞など、意味を持たない語をフィルタリング
+        const stopWords = ['は', 'が', 'を', 'に', 'へ', 'と', 'の', 'で', 'や', 'か', 'から', 'まで', 'より', 'など', 'として', 'という', 'もの', 'ある', 'いる', 'なる', 'れる', 'られる', 'ます', 'です', 'よう', 'こと', 'その', 'この', 'それ', 'これ', 'おいて'];
+        
+        // 1文字以上の単語を抽出（ひらがな・カタカナ・漢字・英数字）
+        const words = normalized.match(/[ぁ-んァ-ヶー一-龠a-z0-9]+/g) || [];
+        
+        // 1文字のキーワードも重要な場合があるため含める
+        return words.filter(word => {
+            return word.length >= 1 && !stopWords.includes(word);
+        });
+    }
+
+    // キーワードベースの判定関数
+    function checkAnswerByKeywords(userAnswer, correctAnswer) {
+        const userKeywords = extractKeywords(userAnswer);
+        const correctKeywords = extractKeywords(correctAnswer);
+        
+        if (correctKeywords.length === 0 || userKeywords.length === 0) {
+            return false;
         }
-        const distance = matrix[len1][len2];
-        return 1 - (distance / Math.max(len1, len2));
+        
+        // より柔軟なマッチング判定
+        let matchCount = 0;
+        let userMatchCount = 0;
+        
+        correctKeywords.forEach(keyword => {
+            if (userKeywords.some(userKeyword => {
+                // 完全一致
+                if (userKeyword === keyword) return true;
+                // 部分一致（長い方が短い方を含む）
+                if (userKeyword.includes(keyword) || keyword.includes(userKeyword)) return true;
+                // 2文字以上で先頭が一致
+                if (userKeyword.length >= 2 && keyword.length >= 2) {
+                    if (userKeyword.substring(0, 2) === keyword.substring(0, 2)) return true;
+                    if (userKeyword.length >= 3 && keyword.length >= 3 && 
+                        userKeyword.substring(0, 3) === keyword.substring(0, 3)) return true;
+                }
+                return false;
+            })) {
+                matchCount++;
+            }
+        });
+        
+        // 逆方向：ユーザーのキーワードが正解にどれだけ含まれているか
+        userKeywords.forEach(userKeyword => {
+            if (correctKeywords.some(keyword => {
+                if (userKeyword === keyword) return true;
+                if (userKeyword.includes(keyword) || keyword.includes(userKeyword)) return true;
+                if (userKeyword.length >= 2 && keyword.length >= 2) {
+                    if (userKeyword.substring(0, 2) === keyword.substring(0, 2)) return true;
+                    if (userKeyword.length >= 3 && keyword.length >= 3 && 
+                        userKeyword.substring(0, 3) === keyword.substring(0, 3)) return true;
+                }
+                return false;
+            })) {
+                userMatchCount++;
+            }
+        });
+        
+        // 正解側の一致率またはユーザー側の一致率が一定以上なら正解
+        const correctMatchRate = matchCount / correctKeywords.length;
+        const userMatchRate = userKeywords.length > 0 ? userMatchCount / userKeywords.length : 0;
+        
+        // かなり緩い判定基準（趣旨が合っていれば正解とする）：
+        // - ユーザー側が35%以上一致
+        // - または正解側が30%以上一致
+        // - または両方の平均が35%以上
+        // - またはユーザーの回答が短く、かつ50%以上一致している場合
+        const isShortAnswer = userKeywords.length <= 5;
+        
+        return userMatchRate >= 0.35 || 
+               correctMatchRate >= 0.3 || 
+               (correctMatchRate + userMatchRate) / 2 >= 0.35 ||
+               (isShortAnswer && userMatchRate >= 0.5);
     }
 
     function loadCorrectlyAnsweredIds() {
@@ -170,14 +230,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const correctAnswer = (quizSettings.quizType === 'term_to_desc') ? currentQuestionData.description : currentQuestionData.term;
         let isCorrect = false;
 
-        if (state.attemptNumber < 3) {
+        // 4択問題の場合は完全一致、記述式の場合はキーワード判定
+        if (state.attemptNumber < 3 && multipleChoiceAreaEl.style.display !== 'none') {
+            // 4択モード
             isCorrect = userAnswer === correctAnswer;
         } else {
-            const similarity = calculateSimilarity(userAnswer, correctAnswer);
-            isCorrect = similarity >= 0.7;
+            // 記述式モード：キーワードベースで判定
+            isCorrect = checkAnswerByKeywords(userAnswer, correctAnswer);
         }
         
-        if (state.attemptNumber === 1 || state.isAnswered) { // 累計解答数は1周目のみカウント、またはisAnsweredで制御
+        if (state.attemptNumber === 1 || state.isAnswered) {
              if (!state.sessionHistory.find(h => h.question === questionTextEl.textContent)) {
                 state.totalAnsweredCount++;
              }
